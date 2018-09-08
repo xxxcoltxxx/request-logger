@@ -19,6 +19,10 @@ class RequestLoggerServiceProvider extends ServiceProvider
             __DIR__ . '/config/request_logger.php', 'request_logger'
         );
 
+        /** @var Router $router */
+        $router = $this->app['router'];
+        $router->aliasMiddleware('request_logger', RequestLogMiddleware::class);
+
         if (config('request_logger.all_routes')) {
             /** @var Kernel $kernel */
             $kernel = $this->app[Kernel::class];
@@ -30,8 +34,8 @@ class RequestLoggerServiceProvider extends ServiceProvider
     {
         $this->app->singleton(RequestDataProvider::class);
 
-        $this->app->singleton('request-logger', function() {
-            return new RequestLoggerManager();
+        $this->app->singleton('request-logger', function () {
+            return resolve(RequestLoggerManager::class);
         });
     }
 }

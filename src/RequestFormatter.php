@@ -2,17 +2,17 @@
 
 namespace RequestLogger;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Symfony\Component\HttpFoundation\Response;
 
 class RequestFormatter
 {
-    public function __invoke(Request $request, Response $response)
+    public function __invoke()
     {
         /** @var RequestDataProvider $logger */
         $logger = resolve(RequestDataProvider::class);
         $exception = $logger->getException();
+        $request = $logger->getRequest();
+        $response = $logger->getResponse();
 
         return [
             'request_method'  => $request->method(),
@@ -20,9 +20,9 @@ class RequestFormatter
             'request_files'   => $this->formatFiles($request->allFiles()),
             'request_headers' => $request->headers->all(),
 
-            'response_content' => $response->getContent(),
-            'response_status'  => $response->getStatusCode(),
-            'response_headers' => $response->headers->all(),
+            'response_content' => $response ? $this->limitContent($response->getContent()) : null,
+            'response_status'  => $response ? $response->getStatusCode() : null,
+            'response_headers' => $response ? $response->headers->all() : null,
 
             'auth_id' => auth()->id(),
 
@@ -31,11 +31,11 @@ class RequestFormatter
             'url'  => $request->path(),
 
             'exception' => $exception ? [
-                'trace'   => $exception->getTraceAsString(),
                 'file'    => $exception->getFile(),
                 'line'    => $exception->getLine(),
                 'message' => $exception->getMessage(),
                 'code'    => $exception->getCode(),
+                'trace'   => $exception->getTraceAsString(),
             ] : null,
 
             'duration' => number_format($logger->getDuration(), 3, '.', ''),
@@ -76,5 +76,12 @@ class RequestFormatter
                 'mime'  => $file->getClientMimeType(),
             ];
         }, $files);
+    }
+
+    protected function limitContent(string $content)
+    {
+        $limit = config('request_logger.transports.graylog.content_limit', false);
+
+        return $limit && mb_strlen($content) > $limit ? mb_substr($content, 0, $limit) . '...' : $content;
     }
 }
