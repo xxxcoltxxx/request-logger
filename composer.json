@@ -9,7 +9,7 @@
     }
   ],
   "require": {
-    "graylog2/gelf-php": "0.1.*"
+    "graylog2/gelf-php": "^1.5"
   },
   "autoload": {
     "psr-4": {
