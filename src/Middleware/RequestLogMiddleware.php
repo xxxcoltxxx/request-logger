@@ -2,7 +2,6 @@
 
 namespace RequestLogger\Middleware;
 
-use Illuminate\Http\Response;
 use RequestLogger\RequestFormatter;
 use RequestLogger\RequestDataProvider;
 use Closure;

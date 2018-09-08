@@ -3,6 +3,7 @@
 namespace RequestLogger;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 
 class RequestFormatter
@@ -14,17 +15,14 @@ class RequestFormatter
         $exception = $logger->getException();
 
         return [
-            'request' => [
-                'method'  => $request->method(),
-                'params'  => $this->hidePasswords($request->input()),
-                'headers' => $request->headers->all(),
-            ],
+            'request_method'  => $request->method(),
+            'request_params'  => $this->hidePasswords($request->input()),
+            'request_files'   => $this->formatFiles($request->allFiles()),
+            'request_headers' => $request->headers->all(),
 
-            'response' => [
-                'content' => $response->getContent(),
-                'status'  => $response->getStatusCode(),
-                'headers' => $response->headers->all(),
-            ],
+            'response_content' => $response->getContent(),
+            'response_status'  => $response->getStatusCode(),
+            'response_headers' => $response->headers->all(),
 
             'auth_id' => auth()->id(),
 
@@ -62,5 +60,21 @@ class RequestFormatter
 
             return $param;
         })->toArray();
+    }
+
+    /**
+     * @param array|UploadedFile[] $files
+     *
+     * @return array
+     */
+    protected function formatFiles(array $files)
+    {
+        return array_map(function (UploadedFile $file) {
+            return [
+                'name'  => $file->getClientOriginalName(),
+                'bytes' => $file->getSize(),
+                'mime'  => $file->getClientMimeType(),
+            ];
+        }, $files);
     }
 }
