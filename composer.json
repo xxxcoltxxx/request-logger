@@ -1,0 +1,26 @@
+{
+  "name": "xxxcoltxxx/request-logger",
+  "description": "Logging http requests and errors",
+  "type": "library",
+  "authors": [
+    {
+      "name": "Александр Парамонов",
+      "email": "xxxcoltxxx@gmail.com"
+    }
+  ],
+  "require": {
+    "graylog2/gelf-php": "0.1.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "RequestLogger\\": "./src"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "RequestLogger\\RequestLoggerServiceProvider"
+      ]
+    }
+  }
+}
