@@ -2,31 +2,31 @@
 
 namespace RequestLogger\Middleware;
 
-use RequestLogger\RequestFormatter;
-use RequestLogger\RequestDataProvider;
 use Closure;
+use RequestLogger\RequestDataProvider;
 
 class RequestLogMiddleware
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Closure                 $next
+     *
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
         /** @var RequestDataProvider $logger */
         $logger = resolve(RequestDataProvider::class);
+        $logger->setRequest($request);
         $start = microtime(true);
 
         $response = $next($request);
 
-        $formatter = new RequestFormatter();
         $logger->setDuration(microtime(true) - $start);
-
-        resolve('request-logger')->send($formatter($request, $response));
+        $logger->setResponse($response);
+        resolve('request-logger')->send();
 
         return $response;
     }

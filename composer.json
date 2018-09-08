@@ -14,7 +14,10 @@
   "autoload": {
     "psr-4": {
       "RequestLogger\\": "./src"
-    }
+    },
+    "files": [
+      "./src/helpers.php"
+    ]
   },
   "extra": {
     "laravel": {

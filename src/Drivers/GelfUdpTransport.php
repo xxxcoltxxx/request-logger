@@ -18,14 +18,14 @@ class GelfUdpTransport
         $this->config = $config;
     }
 
-    public function __invoke(string $shortMessage, array $payload)
+    public function __invoke(array $payload)
     {
         $transport = new UdpTransport($this->config['host'], $this->config['port']);
         $publisher = new Publisher();
         $publisher->addTransport($transport);
 
         $message = new Message();
-        $message->setShortMessage($shortMessage)
+        $message->setShortMessage($this->config['short_message'])
             ->setLevel(LOG_INFO)
             ->setFullMessage(json_encode($payload));
 
