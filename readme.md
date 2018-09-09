@@ -13,19 +13,19 @@ Supported transports out-of-box:
 
 Install via composer
 
-```
+```bash
 composer require xxxcoltxxx/request-logger
 ```
 
 Publish the configuration file
 
-```
+```bash
 php artisan vendor:publish --provider="RequestLogger\RequestLoggerServiceProvider"
 ```
 
 Add exception reporting to your `app/Exception/Handler.php` file
 
-```
+```php
 public function report(Exception $exception)
 {
     resolve(RequestDataProvider::class)->setException($exception);
@@ -74,7 +74,7 @@ Fill configuration
 
 You can add your own messages to request log payload with `request_logger` helper
 
-```
+```php
 request_logger()->addMessage('Full name: John Doe')
 ```
 
@@ -103,7 +103,7 @@ Route::get('admin/profile', function () {
 
 ## Testing
 
-```
+```bash
 composer install
 vendor/bin/phpunit tests
 ```
