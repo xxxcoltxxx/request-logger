@@ -6,19 +6,19 @@ use Gelf\Message;
 use Gelf\Publisher;
 use Gelf\Transport\UdpTransport;
 
-class GelfUdpTransport
+class GelfUdpTransport implements RequestLoggerTransport
 {
     /**
      * @var array
      */
     private $config;
 
-    public function __construct(array $config)
+    public function setConfig(array $config)
     {
         $this->config = $config;
     }
 
-    public function __invoke(array $payload)
+    public function send(array $payload)
     {
         $transport = new UdpTransport($this->config['host'], $this->config['port']);
         $publisher = new Publisher();

@@ -2,10 +2,8 @@
 
 namespace RequestLogger;
 
-use Exception;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use InvalidArgumentException;
+use RequestLogger\Transports\RequestLoggerTransport;
 
 class RequestLoggerManager
 {
@@ -16,10 +14,10 @@ class RequestLoggerManager
         /** @var RequestFormatter $formatter */
         $formatter = resolve(RequestFormatter::class);
         $transport = static::driver(config('request_logger.default'));
-        $transport($formatter());
+        $transport->send($formatter());
     }
 
-    public function driver(string $name)
+    public function driver(string $name): RequestLoggerTransport
     {
         $config = config("request_logger.transports.{$name}");
 
@@ -30,6 +28,9 @@ class RequestLoggerManager
         $driverClass = $config['driver'];
         unset($config['driver']);
 
-        return new $driverClass($config);
+        $driver = resolve($driverClass);
+        $driver->setConfig($config);
+
+        return $driver;
     }
 }
