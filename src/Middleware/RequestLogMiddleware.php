@@ -18,13 +18,16 @@ class RequestLogMiddleware
     public function handle($request, Closure $next)
     {
         /** @var RequestDataProvider $logger */
-        $logger = resolve(RequestDataProvider::class);
+        $logger = request_logger();
         $logger->setRequest($request);
-        $start = microtime(true);
+        $start = now();
 
         $response = $next($request);
 
-        $logger->setDuration(microtime(true) - $start);
+        $finish = now();
+        $logger->setDuration(
+            ($finish->timestamp + $finish->micro / 1000000) - ($start->timestamp + $start->micro / 1000000)
+        );
         $logger->setResponse($response);
         resolve('request-logger')->send();
 

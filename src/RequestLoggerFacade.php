@@ -6,7 +6,8 @@ use Illuminate\Support\Facades\Facade;
 
 class RequestLoggerFacade extends Facade
 {
-    protected static function getFacadeAccessor() {
+    protected static function getFacadeAccessor()
+    {
         return 'request-logger';
     }
 }
