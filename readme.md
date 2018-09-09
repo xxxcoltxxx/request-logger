@@ -1,12 +1,10 @@
 # :memo: Laravel request logger
 
-<p align="center">
-    <a href="https://travis-ci.org/xxxcoltxxx/request-logger"><img src="https://travis-ci.org/xxxcoltxxx/request-logger.svg" alt="Build Status"></a>
-    <a href="https://packagist.org/packages/xxxcoltxxx/request-logger"><img src="https://poser.pugx.org/xxxcoltxxx/request-logger/d/total.svg" alt="Total Downloads"></a>
-    <a href="https://packagist.org/packages/xxxcoltxxx/request-logger"><img src="https://poser.pugx.org/xxxcoltxxx/request-logger/v/stable.svg" alt="Latest Stable Version"></a>
-</p>
+[![Build Status](https://travis-ci.com/xxxcoltxxx/request-logger.svg?branch=master)](https://travis-ci.com/xxxcoltxxx/request-logger)
+[![Latest Stable Version](https://poser.pugx.org/xxxcoltxxx/request-logger/v/stable)](https://packagist.org/packages/xxxcoltxxx/request-logger)
+[![Total Downloads](https://poser.pugx.org/xxxcoltxxx/request-logger/downloads)](https://packagist.org/packages/xxxcoltxxx/request-logger)
 
-A package to send request and response payload to external logging system.
+This package allows send request and response payload to external logging system.
 
 Supported transports out-of-box:
 * Graylog server
