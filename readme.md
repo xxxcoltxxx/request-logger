@@ -1,4 +1,10 @@
-# Laravel request logger
+# :memo: Laravel request logger
+
+<p align="center">
+    <a href="https://travis-ci.org/xxxcoltxxx/request-logger"><img src="https://travis-ci.org/xxxcoltxxx/request-logger.svg" alt="Build Status"></a>
+    <a href="https://packagist.org/packages/xxxcoltxxx/request-logger"><img src="https://poser.pugx.org/xxxcoltxxx/request-logger/d/total.svg" alt="Total Downloads"></a>
+    <a href="https://packagist.org/packages/xxxcoltxxx/request-logger"><img src="https://poser.pugx.org/xxxcoltxxx/request-logger/v/stable.svg" alt="Latest Stable Version"></a>
+</p>
 
 A package to send request and response payload to external logging system.
 
@@ -97,10 +103,17 @@ Route::get('admin/profile', function () {
 })->middleware('request_logger');
 ``` 
 
+## Testing
+
+```
+composer install
+vendor/bin/phpunit tests
+```
+
 ## Road map
 
-1. Unit tests
-1. Documentation for:
+1. [x] Unit tests
+1. [ ] Documentation for:
    * Customization log format
    * Writing own drivers
-1. Make video "How it works with graylog"
+1. [ ] Make video "How it works with graylog"
