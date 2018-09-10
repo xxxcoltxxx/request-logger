@@ -114,4 +114,6 @@ vendor/bin/phpunit tests
 1. [ ] Documentation for:
    * Customization log format
    * Writing own drivers
+1. [ ] Add changelog
 1. [ ] Make video "How it works with graylog"
+1. [ ] Add file driver
