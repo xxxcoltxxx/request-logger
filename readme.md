@@ -7,7 +7,7 @@
 This package allows sending request and response payload to the external logging system.
 
 Supported out-of-box transports:
-* Graylog server
+* [Graylog server](https://www.graylog.org)
 
 ## Installation
 
