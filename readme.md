@@ -4,9 +4,9 @@
 [![Latest Stable Version](https://poser.pugx.org/xxxcoltxxx/request-logger/v/stable)](https://packagist.org/packages/xxxcoltxxx/request-logger)
 [![Total Downloads](https://poser.pugx.org/xxxcoltxxx/request-logger/downloads)](https://packagist.org/packages/xxxcoltxxx/request-logger)
 
-This package allows send request and response payload to external logging system.
+This package allows sending request and response payload to the external logging system.
 
-Supported transports out-of-box:
+Supported out-of-box transports:
 * Graylog server
 
 ## Installation
@@ -72,7 +72,7 @@ Fill configuration
 
 ## Adding app messages to request log
 
-You can add your own messages to request log payload with `request_logger` helper
+You can add custom messages to payload with `request_logger` helper.
 
 ```php
 request_logger()->addMessage('Full name: John Doe')
@@ -81,7 +81,7 @@ request_logger()->addMessage('Full name: John Doe')
 ## Enable logging only for specific routes
 
 Request logger enabled on all routes by default.
-You can disable `all_routes` option in configuration file and use `request_logger` middleware on custom routes
+You can disable `all_routes` option in the configuration file and use `request_logger` middleware in routes configuration.
 
 Documentation for registering middleware can be found in [Laravel documentation](https://laravel.com/docs/5.7/middleware#registering-middleware)
 
@@ -108,7 +108,7 @@ composer install
 vendor/bin/phpunit tests
 ```
 
-## Road map
+## Roadmap
 
 1. [x] Unit tests
 1. [ ] Documentation for:
