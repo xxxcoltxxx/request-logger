@@ -15,9 +15,12 @@ class RequestFormatter
         $response = $logger->getResponse();
 
         return [
-            'request_method'  => $request->method(),
-            'request_params'  => $this->hidePasswords($request->input()),
-            'request_files'   => $this->formatFiles($request->allFiles()),
+            'request_method'  => $request->getMethod(),
+            'request_params'  => $this->hidePasswords(array_merge(
+                $request->query->all(),
+                $request->request->all()
+            )),
+            'request_files'   => $this->formatFiles($request->files->all()),
             'request_headers' => $request->headers->all(),
 
             'response_content' => $response ? $this->limitContent($response->getContent()) : null,
@@ -27,8 +30,8 @@ class RequestFormatter
             'auth_id' => auth()->id(),
 
             'host' => ($request->isSecure() ? 'https://' : 'http://') . $request->getHttpHost(),
-            'ip'   => $request->ip(),
-            'url'  => $request->path(),
+            'ip'   => $request->getClientIp(),
+            'uri'  => $request->getRequestUri(),
 
             'exception' => $exception ? [
                 'file'    => $exception->getFile(),

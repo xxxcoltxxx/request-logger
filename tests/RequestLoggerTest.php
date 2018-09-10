@@ -133,11 +133,10 @@ class RequestLoggerTest extends TestCase
         $this->assertEquals($ip, $this->actualPayload['ip']);
     }
 
-    public function test_url()
+    public function test_uri()
     {
         $this->putJson($this->uri)->assertSuccessful();
-
-        $this->assertEquals($this->uri, $this->actualPayload['url']);
+        $this->assertEquals('/' . $this->uri, $this->actualPayload['uri']);
     }
 
     public function test_exception()
@@ -179,5 +178,24 @@ class RequestLoggerTest extends TestCase
         $this->assertEquals([
             'Message 1', ['nickname' => 'John Doe'],
         ], $this->actualPayload['messages']);
+    }
+
+    public function test_response_content_limit()
+    {
+        Config::set('request_logger.transports.graylog.content_limit', 10000);
+        Route::put($this->uri, function () {
+            return str_repeat('t', 50000);
+        });
+
+        $this->put($this->uri)->assertSuccessful();
+        $this->assertEquals(str_repeat('t', 10000) . '...', $this->actualPayload['response_content']);
+    }
+
+    public function test_hide_passwords()
+    {
+        $this->putJson($this->uri, ['login' => 'j.doe', 'password' => str_random(8)])->assertSuccessful();
+        $request_params = $this->actualPayload['request_params'];
+        $this->assertEquals(str_repeat('*', 8), $request_params['password']);
+        $this->assertEquals('j.doe', $request_params['login']);
     }
 }
