@@ -46,9 +46,12 @@ Fill configuration
 // Default transport
 'default' => env('REQUEST_LOGGER_TRANSPORT', 'graylog'),
 
+// The class for format log message
+'formatter' => RequestLogger\RequestFormatter::class,
+
 /*
- * Allowed transports with all necessary configuration.
- * Drivers: 'graylog'
+ * Allowed transports with its configuration.
+ * Drivers: 'graylog', 'log', 'null'
  */
 'transports' => [
 
