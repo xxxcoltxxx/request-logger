@@ -44,7 +44,7 @@ Fill configuration
 'all_routes' => true,
 
 // Default transport
-'default' => 'graylog',
+'default' => env('REQUEST_LOGGER_TRANSPORT', 'graylog'),
 
 /*
  * Allowed transports with all necessary configuration.
@@ -55,20 +55,22 @@ Fill configuration
     // The graylog transport
     'graylog' => [
         // The Short message for graylog
-        'short_message' => 'requests',
+        'short_message' => env('GRAYLOG_SHORT_MESSAGE', 'requests'),
 
         // Limit content size (in bytes). Set false to disable. Graylog has limitations on input messages
-        'content_limit' => 30000,
+        'content_limit' => env('GRAYLOG_CONTENT_LIMIT', 30000),
 
         // The IP address of the log server
-        'host' => '127.0.0.1',
+        'host' => env('GRAYLOG_HOST', '127.0.0.1'),
 
         // The UDP port of the log server
-        'port' => '12201',
+        'port' => env('GRAYLOG_PORT', '12201'),
 
-        // Then driver for send requests log to log server
+        // The driver for send requests log to log server
         'driver' => RequestLogger\Transports\GelfUdpTransport::class,
     ],
+
+    // ...
 ],
 ```
 
@@ -93,7 +95,7 @@ Documentation for registering middleware can be found in [Laravel documentation]
 return [
     'all_routes' => false,
 
-    # ...
+    // ...
 ];
 
 # routes/api.php
@@ -103,40 +105,45 @@ Route::get('admin/profile', function () {
 })->middleware('request_logger');
 ``` 
 
-## Customization log format
+## Custom log format
 
 For custom log format you can use closure in the configuration file:
 ```php
 # config/request_logger.php
 
 return [
-     # ...
+    // ...
 
     'formatter' => function () {
         $provider  = request_logger();
         $exception = $provider->getException();
         $request   = $provider->getRequest();
         $response  = $provider->getResponse();
-    
+
         return [
             'uri'           => $request->getRequestUri(),
             'has_exception' => ! is_null($exception),
         ];
     }
-    
-    # ...
+
+    // ...
 ```
 
-## Writing own drivers
-For write own driver you must add driver configuration and implement `RequestLogger\Transports\RequestLoggerTransport` interface:
+## Writing custom drivers
+For writing custom driver you must add driver configuration and implement `RequestLogger\Transports\RequestLoggerTransport` interface:
 
 ```php
+# .env
+
+REQUEST_LOGGER_TRANSPORT=custom
+
 # config/request_logger.php
 
 return [
-    'default' => 'custom',
+    // ...
 
     'transports' => [
+        // ...
 
         'custom' => [
             'driver' => Namespace\CustomTransport::class,
@@ -145,6 +152,10 @@ return [
     ],
 ];
 ```
+
+## Disable request logger in application tests
+
+Use `null` driver. You can use `REQUEST_LOGGER_TRANSPORT` variable in `phpunit.xml` configuration file.
 
 ## Testing
 
@@ -157,8 +168,8 @@ vendor/bin/phpunit tests
 
 1. [x] Unit tests
 1. [x] Write Documentation for:
-   * Customization log format
-   * Writing own drivers
+   * Custom log format
+   * Writing custom drivers
 1. [x] Add `log` driver
 1. [x] Add `null` driver
 1. [x] Add changelog
