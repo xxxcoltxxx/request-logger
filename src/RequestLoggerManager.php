@@ -12,8 +12,9 @@ class RequestLoggerManager
     public function send()
     {
         /** @var RequestFormatter $formatter */
-        $formatter = resolve(RequestFormatter::class);
-        $transport = static::driver(config('request_logger.default'));
+        $formatterValue = config('request_logger.formatter');
+        $formatter = is_string($formatterValue) ? resolve($formatterValue) : $formatterValue;
+        $transport = static::driver(config('request_logger.default') ?? 'null');
         $transport->send($formatter());
     }
 

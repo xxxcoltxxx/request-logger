@@ -8,11 +8,11 @@ class RequestFormatter
 {
     public function __invoke()
     {
-        /** @var RequestDataProvider $logger */
-        $logger = resolve(RequestDataProvider::class);
-        $exception = $logger->getException();
-        $request = $logger->getRequest();
-        $response = $logger->getResponse();
+        /** @var RequestDataProvider $provider */
+        $provider = resolve(RequestDataProvider::class);
+        $exception = $provider->getException();
+        $request = $provider->getRequest();
+        $response = $provider->getResponse();
 
         return [
             'request_method'  => $request->getMethod(),
@@ -41,8 +41,8 @@ class RequestFormatter
                 'trace'   => $exception->getTraceAsString(),
             ] : null,
 
-            'duration' => number_format($logger->getDuration(), 3, '.', ''),
-            'messages' => $logger->getMessages(),
+            'duration' => number_format($provider->getDuration(), 3, '.', ''),
+            'messages' => $provider->getMessages(),
         ];
     }
 
