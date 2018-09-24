@@ -5,7 +5,7 @@ return [
     'all_routes' => true,
 
     // Default transport
-    'default' => 'graylog',
+    'default' => env('REQUEST_LOGGER_TRANSPORT', 'graylog'),
 
     // The class for format log message
     'formatter' => RequestLogger\RequestFormatter::class,
