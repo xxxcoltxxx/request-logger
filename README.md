@@ -7,7 +7,9 @@
 This package allows sending request and response payload to the external logging system.
 
 Supported out-of-box transports:
-* [Graylog server](https://www.graylog.org)
+* `graylog` transport for sending request log to [Graylog server](https://www.graylog.org)
+* `log` transport for sending request log to [Laravel logging system](https://laravel.com/docs/5.7/logging)
+* `null` transport for skip request log in application tests
 
 ## Installation
 
@@ -28,7 +30,7 @@ Add exception reporting to your `app/Exception/Handler.php` file
 ```php
 public function report(Exception $exception)
 {
-    resolve(RequestDataProvider::class)->setException($exception);
+    request_logger()->setException($exception);
 
     // ...
     parent::report($exception);
@@ -101,6 +103,49 @@ Route::get('admin/profile', function () {
 })->middleware('request_logger');
 ``` 
 
+## Customization log format
+
+For custom log format you can use closure in the configuration file:
+```php
+# config/request_logger.php
+
+return [
+     # ...
+
+    'formatter' => function () {
+        $provider  = request_logger();
+        $exception = $provider->getException();
+        $request   = $provider->getRequest();
+        $response  = $provider->getResponse();
+    
+        return [
+            'uri'           => $request->getRequestUri(),
+            'has_exception' => ! is_null($exception),
+        ];
+    }
+    
+    # ...
+```
+
+## Writing own drivers
+For write own driver you must add driver configuration and implement `RequestLogger\Transports\RequestLoggerTransport` interface:
+
+```php
+# config/request_logger.php
+
+return [
+    'default' => 'custom',
+
+    'transports' => [
+
+        'custom' => [
+            'driver' => Namespace\CustomTransport::class,
+            'custom_option' => 'value',
+        ],
+    ],
+];
+```
+
 ## Testing
 
 ```bash
@@ -111,9 +156,10 @@ vendor/bin/phpunit tests
 ## Roadmap
 
 1. [x] Unit tests
-1. [ ] Documentation for:
+1. [x] Write Documentation for:
    * Customization log format
    * Writing own drivers
-1. [ ] Add changelog
+1. [x] Add `log` driver
+1. [x] Add `null` driver
+1. [x] Add changelog
 1. [ ] Make video "How it works with graylog"
-1. [ ] Add file driver

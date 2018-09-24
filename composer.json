@@ -22,6 +22,7 @@
   ],
   "require": {
     "php": "^7.1",
+    "ext-json": "^1.5",
     "graylog2/gelf-php": "^1.5"
   },
   "require-dev": {

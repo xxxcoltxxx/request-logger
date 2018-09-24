@@ -2,38 +2,31 @@
 
 namespace Tests;
 
-use Exception;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Mockery;
-use RequestLogger\Transports\GelfUdpTransport;
+use RequestLogger\Transports\NullTransport;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class RequestLoggerTest extends TestCase
 {
-    protected $uri = '__request_logger';
-
-    protected $response = ['items' => [1, 3]];
-
     protected $actualPayload;
 
     protected function setUp()
     {
         parent::setUp();
 
-        Route::put($this->uri, function () {
-            return response()->json($this->response, 201, ['x-response-header' => 'response-header-value']);
-        });
-
-        $transport = Mockery::mock(GelfUdpTransport::class)->makePartial();
+        $transport = Mockery::mock(NullTransport::class)->makePartial();
         $transport->shouldReceive('send')->once()->withArgs(function (array $args) {
             $this->actualPayload = $args;
 
             return true;
         });
-        $this->app->instance(GelfUdpTransport::class, $transport);
+        $this->app->instance(NullTransport::class, $transport);
     }
 
     public function test_route_works()
@@ -51,7 +44,7 @@ class RequestLoggerTest extends TestCase
 
     public function test_query_params()
     {
-        $this->putJson($this->uri . '?query_param=query_value')->assertSuccessful();
+        $this->putJson("{$this->uri}?query_param=query_value")->assertSuccessful();
         $this->assertEquals(
             ['query_param' => 'query_value'],
             $this->actualPayload['request_params']
@@ -136,12 +129,12 @@ class RequestLoggerTest extends TestCase
     public function test_uri()
     {
         $this->putJson($this->uri)->assertSuccessful();
-        $this->assertEquals('/' . $this->uri, $this->actualPayload['uri']);
+        $this->assertEquals("/{$this->uri}", $this->actualPayload['uri']);
     }
 
     public function test_exception()
     {
-        $exception = new Exception('Custom exception message', 400);
+        $exception = new HttpException(Response::HTTP_BAD_REQUEST, 'Test exception message');
         Route::put($this->uri, function () use ($exception) {
             request_logger()->setException($exception);
             throw $exception;
@@ -182,7 +175,7 @@ class RequestLoggerTest extends TestCase
 
     public function test_response_content_limit()
     {
-        Config::set('request_logger.transports.graylog.content_limit', 10000);
+        $this->setConfig('transports.graylog.content_limit', 10000);
         Route::put($this->uri, function () {
             return str_repeat('t', 50000);
         });
@@ -197,5 +190,37 @@ class RequestLoggerTest extends TestCase
         $request_params = $this->actualPayload['request_params'];
         $this->assertEquals(str_repeat('*', 8), $request_params['password']);
         $this->assertEquals('j.doe', $request_params['login']);
+    }
+
+    public function test_custom_log_format()
+    {
+        // Set custom formatter closure
+        $this->setConfig('formatter', function () {
+            $provider = request_logger();
+            $exception = $provider->getException();
+            $request = $provider->getRequest();
+            $response = $provider->getResponse();
+
+            return [
+                'exception_message' => $exception->getMessage(),
+                'request_uri'       => $request->getRequestUri(),
+                'response_status'   => $response->getStatusCode(),
+            ];
+        });
+
+        // Register route that throw exception and put it to logger
+        $exception = new HttpException(Response::HTTP_BAD_REQUEST, 'Test exception message');
+        Route::put($this->uri, function () use ($exception) {
+            request_logger()->setException($exception);
+            throw $exception;
+        });
+
+        $this->putJson($this->uri)->assertStatus(Response::HTTP_BAD_REQUEST);
+
+        $this->assertEquals([
+            'exception_message' => $exception->getMessage(),
+            'request_uri'       => "/{$this->uri}",
+            'response_status'   => Response::HTTP_BAD_REQUEST,
+        ], $this->actualPayload);
     }
 }
