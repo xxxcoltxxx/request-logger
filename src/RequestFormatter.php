@@ -2,7 +2,7 @@
 
 namespace RequestLogger;
 
-use Illuminate\Http\UploadedFile;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class RequestFormatter
 {
